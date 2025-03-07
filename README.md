@@ -20,10 +20,10 @@ Architecture : <br>
   Backend : AWS to store photos, somehow needs to be tied to a clients name under the correct business.
 
 
-  Other things we spoke about:
-  Sending invoices via a link
-  Scheduling
-  Eventually a front end
+  Other things we spoke about: <br>
+  Sending invoices via a link <br>
+  Scheduling <br>
+  Eventually a front end <br>
 
 Things to consider: <br>
 There are two way we can approach this project.
