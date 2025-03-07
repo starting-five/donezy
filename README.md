@@ -33,4 +33,7 @@ There are two ways we can approach this project.
 A sample link from a car dealership using the same use case:<br>
 https://video.37483.net/timeline/mzuqnFSa6hAaUM7e
 
+BHAG (Big Hairy Audacious Goal):
+* Same process but reversed. We can have customers use the app to post pictures of the work they want to get done and have businesses bid on the project. Customers will have the option to pick which bidder they want to go with based on price, work done in the past, availability, etc. To be able to see work done in the past, the customer should be able to see all the jobs the business has completed. This would encourage businessees to use the app more so they would have a portfolio for future customers to see.
+
 Created on March 3, 2025
