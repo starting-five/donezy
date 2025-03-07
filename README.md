@@ -25,8 +25,8 @@ Architecture : <br>
   Scheduling
   Eventually a front end
 
-Things to consider:
-  There are two way we can approach this project.
+Things to consider: <br>
+There are two way we can approach this project.
   - Approach 1: We can do it from a backend perspective to create the APIs to handle storing pictures but getting them would require another API call, which will not be straightforward for customers who are not tech savvy.
   - Approach 2: We can create a frontend from the start and do things manually as in create a static html page that contains all the before and after pics. Pros: easy to build, we'd have a complete view of what the actual product will look like, we'd be able to get customer feedback as we build the backend. Cons: every time we have a new job to post, we'd have to manually add them to our source code which means that a system reboot is needed. This would cost our system to go offline but since we don't have a heavy number of users initially, this may not be a big issue for us.
 
