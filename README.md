@@ -1,5 +1,11 @@
 # donezy
 
+Todo List
+* Create HTML mock page locally with output that needs to be shown
+* Use WordPress
+* Research AWS on servers, to host application
+* Setup code on AWS: essentially from local to production
+* Send link created by AWS to customer via text message - dont index it
 
 
 
