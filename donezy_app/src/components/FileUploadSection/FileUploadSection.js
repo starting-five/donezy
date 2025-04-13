@@ -10,7 +10,7 @@ import byteSize from 'byte-size';
 import React, { useState } from 'react';
 import './FileUploadSection.scss'; // Import the SCSS file
 
-const FileUploadSection = ({ title, onFilesChange, fileStatuses, loading, emptyRows = 0 }) => {
+const FileUploadSection = ({ title, onFilesChange, fileStatuses, loading, hasUploaded, emptyRows = 0 }) => {
     const [files, setFiles] = useState([]);
 
     const handleFileChange = (event) => {
@@ -62,8 +62,12 @@ const FileUploadSection = ({ title, onFilesChange, fileStatuses, loading, emptyR
                                     <TableCell>{status}</TableCell>
                                     <TableCell>
                                         <DeleteIcon
-                                            onClick={() => handleRemoveFile(index)}
-                                            className="delete-icon"
+                                            onClick={() => {
+                                                if (!hasUploaded) {
+                                                    handleRemoveFile(index);
+                                                }
+                                            }}
+                                            className={`delete-icon ${hasUploaded ? 'disabled' : ''}`}
                                         />
                                     </TableCell>
                                 </TableRow>

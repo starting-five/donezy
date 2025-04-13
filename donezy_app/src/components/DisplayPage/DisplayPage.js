@@ -7,14 +7,15 @@ const DisplayPage = () => {
     const { uniqueID } = useParams(); // Get the unique ID from the URL
     const [beforeImages, setBeforeImages] = useState([]); // State to store "before" image URLs
     const [afterImages, setAfterImages] = useState([]); // State to store "after" image URLs
-    const S3_BUCKET = 'donezy'; // Replace with your S3 bucket name
-    const REGION = 'us-west-1'; // Replace with your S3 bucket region
 
     useEffect(() => {
+        const S3_BUCKET = process.env.REACT_APP_AWS_S3_BUCKET;
+        const REGION = process.env.REACT_APP_AWS_REGION;
+        
         // Configure AWS SDK
         AWS.config.update({
-            accessKeyId: 'AKIARXR7OELODM56VL7V', // Replace with your access key
-            secretAccessKey: 'iq0jsSVjwkgwviokDOS4Igb3OdZ7ZSJazVw+G3Cm', // Replace with your secret key
+            accessKeyId: process.env.REACT_APP_AWS_ACCESS_KEY_ID,
+            secretAccessKey: process.env.REACT_APP_AWS_SECRET_ACCESS_KEY,
             region: REGION,
         });
 

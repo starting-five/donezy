@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import ShortUniqueId from 'short-unique-id';
 import FileUploadSection from '../FileUploadSection/FileUploadSection';
 import './UploadPage.scss';
+import { Link } from 'react-router-dom';
 
 const UploadPage = () => {
     const [beforeFiles, setBeforeFiles] = useState([]);
@@ -105,7 +106,7 @@ const UploadPage = () => {
                 <div className="upload-success">
                     <h2>Files Uploaded Successfully!</h2>
                     <p>Your unique ID is: {folderId}</p>
-                    <a href={`/${folderId}`}>View Uploaded Files</a>
+                    <Link to={`/${folderId}`}>View Uploaded Files</Link>
                 </div>
             )}
             <FileUploadSection
@@ -116,6 +117,7 @@ const UploadPage = () => {
                 }}
                 fileStatuses={fileStatuses}
                 loading={loading || hasUploaded}
+                hasUploaded={hasUploaded}
                 emptyRows={0}
             />
             <FileUploadSection
@@ -126,6 +128,7 @@ const UploadPage = () => {
                 }}
                 fileStatuses={fileStatuses}
                 loading={loading || hasUploaded}
+                hasUploaded={hasUploaded}
                 emptyRows={0}
             />
             <div style={{ display: 'flex', justifyContent: 'center', marginTop: '16px' }}>
