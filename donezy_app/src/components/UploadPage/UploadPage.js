@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from 'react';
-import FileUploadSection from './FileUploadSection';
 import AWS from 'aws-sdk';
+import React, { useEffect, useState } from 'react';
 import ShortUniqueId from 'short-unique-id';
+import FileUploadSection from '../FileUploadSection/FileUploadSection';
+import './UploadPage.scss';
 
-const Upload = () => {
+const UploadPage = () => {
     const [beforeFiles, setBeforeFiles] = useState([]);
     const [afterFiles, setAfterFiles] = useState([]);
     const [fileStatuses, setFileStatuses] = useState({});
@@ -55,12 +56,13 @@ const Upload = () => {
             return;
         }
 
-        const S3_BUCKET = 'donezy';
-        const REGION = 'us-west-1';
+        const S3_BUCKET = process.env.REACT_APP_AWS_S3_BUCKET;
+        const REGION = process.env.REACT_APP_AWS_REGION;
 
         AWS.config.update({
-            accessKeyId: 'AKIARXR7OELODM56VL7V',
-            secretAccessKey: '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',
+            accessKeyId: process.env.REACT_APP_AWS_ACCESS_KEY_ID,
+            secretAccessKey: process.env.REACT_APP_AWS_SECRET_ACCESS_KEY,
+            region: REGION,
         });
 
         const s3 = new AWS.S3({
@@ -98,14 +100,12 @@ const Upload = () => {
     };
 
     return (
-        <div style={styles.wrapper}>
-            {hasUploaded && (
-                <div style={{ textAlign: 'center', marginBottom: '16px' }}>
-                    <h2 style={{ color: 'green' }}>Files Uploaded Successfully!</h2>
+        <div className="wrapper">
+            {hasUploaded && folderId && (
+                <div className="upload-success">
+                    <h2>Files Uploaded Successfully!</h2>
                     <p>Your unique ID is: {folderId}</p>
-                    <a href={`/${folderId}`} style={{ textDecoration: 'underline', color: 'blue' }}>
-                        View Uploaded Files
-                    </a>
+                    <a href={`/${folderId}`}>View Uploaded Files</a>
                 </div>
             )}
             <FileUploadSection
@@ -132,21 +132,11 @@ const Upload = () => {
                 <button
                     onClick={uploadFile}
                     disabled={loading || hasUploaded || (beforeFiles.length === 0 && afterFiles.length === 0)}
-                    style={{
-                        padding: '16px 32px', // Bigger padding for a larger button
-                        fontSize: '18px', // Larger font size
-                        backgroundColor: loading || hasUploaded || (beforeFiles.length === 0 && afterFiles.length === 0)
-                            ? '#6c757d' // Gray color when disabled
-                            : '#28a745', // Green color when enabled
-                        color: '#fff',
-                        border: 'none',
-                        borderRadius: '8px', // Slightly more rounded corners
-                        cursor: loading || hasUploaded || (beforeFiles.length === 0 && afterFiles.length === 0)
-                            ? 'not-allowed' // Disabled cursor
-                            : 'pointer', // Pointer cursor when enabled
-                        transition: 'background-color 0.3s ease, transform 0.2s ease', // Smooth hover effect
-                    }}
-                    className="upload-button"
+                    className={`upload-button ${
+                        loading || hasUploaded || (beforeFiles.length === 0 && afterFiles.length === 0)
+                            ? 'disabled'
+                            : 'enabled'
+                    }`}
                 >
                     {loading ? 'Uploading...' : hasUploaded ? 'Uploaded' : 'Upload All Files'}
                 </button>
@@ -155,16 +145,4 @@ const Upload = () => {
     );
 };
 
-const styles = {
-    wrapper: {
-        border: '2px solid #ccc',
-        borderRadius: '10px',
-        padding: '20px',
-        margin: '20px auto',
-        maxWidth: '800px',
-        boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
-        backgroundColor: '#f9f9f9',
-    },
-};
-
-export default Upload;
+export default UploadPage;
