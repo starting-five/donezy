@@ -1,15 +1,25 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import './index.css';
+import './index.scss';
 import App from './App';
-import { MantineProvider } from '@mantine/core';
+// import { MantineProvider } from '@mantine/core';
+import { Auth0Provider } from '@auth0/auth0-react';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
+console.log("Environment Variables:", process.env);
+console.log('Auth0 Domain:', process.env.REACT_APP_AUTH0_DOMAIN);
+console.log('Auth0 Client ID:', process.env.REACT_APP_AUTH0_CLIENT_ID);
 root.render(
   <React.StrictMode>
-    <MantineProvider withGlobalStyles withNormalizeCSS>
-      <App />
-    </MantineProvider>
+      <Auth0Provider
+        domain={process.env.REACT_APP_AUTH0_DOMAIN}
+        clientId={process.env.REACT_APP_AUTH0_CLIENT_ID}
+        authorizationParams={{
+          redirect_uri: window.location.origin
+        }}
+    >
+    <App />
+  </Auth0Provider>
   </React.StrictMode>
 );
 

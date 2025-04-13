@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import FileDisplaySection from './FileDisplaySection';
+import FileDisplaySection from '../FileDisplaySection/FileDisplaySection';
 import AWS from 'aws-sdk';
 
 const DisplayPage = () => {
