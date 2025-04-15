@@ -13,7 +13,8 @@ const HomePage = () => {
 
     useEffect(() => {
         if (isAuthenticated) {
-            navigate('/upload');
+            // navigate('/upload');
+            navigate('/dashboard'); // Redirect to the dashboard page after successful login
         }
     }, [isAuthenticated, navigate]);
 
