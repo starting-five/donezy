@@ -1,0 +1,9 @@
+create graphql endpoint
+cereate models for users, logs, post
+flow:
+
+create a new log after successful login
+    check if user exist
+    if exist, add new entry to log
+
+if user create a new post, add entry to db

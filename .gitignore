@@ -1,1 +1,3 @@
 /donezy_app/node_modules/*
+/app/client/node_modules/*
+/app/server/node_modules/*

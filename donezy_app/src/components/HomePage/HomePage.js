@@ -17,11 +17,11 @@ const HomePage = () => {
             navigate('/dashboard'); // Redirect to the dashboard page after successful login
         }
     }, [isAuthenticated, navigate]);
-
+console.log("---------isLoading", isLoading);
     if (isLoading) {
         return <div className="loading">Loading...</div>;
     }
-
+console.log("--------after isLoading", isLoading);
     return (
         <div className="container">
             <h1 className="title">Welcome to Donezy</h1>
