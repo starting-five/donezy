@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import DeleteIcon from '@mui/icons-material/Delete'; // Import the Delete icon
 import Card from '@mui/material/Card';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -7,9 +7,10 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import byteSize from 'byte-size';
-import DeleteIcon from '@mui/icons-material/Delete'; // Import the Delete icon
+import React, { useState } from 'react';
+import './FileUploadSection.scss'; // Import the SCSS file
 
-const FileUploadSection = ({ title, onFilesChange, fileStatuses, loading, emptyRows = 0 }) => {
+const FileUploadSection = ({ title, onFilesChange, fileStatuses, loading, hasUploaded, emptyRows = 0 }) => {
     const [files, setFiles] = useState([]);
 
     const handleFileChange = (event) => {
@@ -34,38 +35,20 @@ const FileUploadSection = ({ title, onFilesChange, fileStatuses, loading, emptyR
     };
 
     return (
-        <div
-            style={{
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'center',
-                alignItems: 'center',
-                textAlign: 'center',
-                boxSizing: 'border-box',
-                marginBottom: '16px',
-            }}
-        >
-            <TableContainer
-                component={Card}
-                sx={{
-                    width: '650px',
-                    margin: '0 auto',
-                    padding: '16px',
-                    boxShadow: 'none',
-                }}
-            >
+        <div className="file-upload-section">
+            <TableContainer component={Card} className="table-container">
                 <Table aria-label="simple table">
                     <TableHead>
                         <TableRow>
-                            <TableCell colSpan={4} align="center" style={{ fontWeight: 'bold' }}>
+                            <TableCell colSpan={4} className="table-header">
                                 {title}
                             </TableCell>
                         </TableRow>
                         <TableRow>
-                            <TableCell style={{ width: '35%' }}>File Name</TableCell>
-                            <TableCell style={{ width: '25%' }}>File Size</TableCell>
-                            <TableCell style={{ width: '25%' }}>Status</TableCell>
-                            <TableCell style={{ width: '15%' }}>Actions</TableCell>
+                            <TableCell className="table-cell file-name">File Name</TableCell>
+                            <TableCell className="table-cell file-size">File Size</TableCell>
+                            <TableCell className="table-cell file-status">Status</TableCell>
+                            <TableCell className="table-cell file-actions">Actions</TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
@@ -79,11 +62,12 @@ const FileUploadSection = ({ title, onFilesChange, fileStatuses, loading, emptyR
                                     <TableCell>{status}</TableCell>
                                     <TableCell>
                                         <DeleteIcon
-                                            onClick={() => handleRemoveFile(index)}
-                                            sx={{
-                                                color: 'black', // Set the icon color to black
-                                                cursor: 'pointer',
+                                            onClick={() => {
+                                                if (!hasUploaded) {
+                                                    handleRemoveFile(index);
+                                                }
                                             }}
+                                            className={`delete-icon ${hasUploaded ? 'disabled' : ''}`}
                                         />
                                     </TableCell>
                                 </TableRow>
@@ -94,7 +78,7 @@ const FileUploadSection = ({ title, onFilesChange, fileStatuses, loading, emptyR
                         {files.length === 0 &&
                             Array.from({ length: emptyRows }).map((_, index) => (
                                 <TableRow key={`empty-${index}`}>
-                                    <TableCell colSpan={4} style={{ textAlign: 'center', color: '#aaa' }}>
+                                    <TableCell colSpan={4} className="table-cell empty-row">
                                         Empty Row
                                     </TableCell>
                                 </TableRow>
@@ -103,15 +87,7 @@ const FileUploadSection = ({ title, onFilesChange, fileStatuses, loading, emptyR
                 </Table>
             </TableContainer>
             <label
-                style={{
-                    display: 'inline-block',
-                    padding: '8px 16px',
-                    backgroundColor: loading ? '#6c757d' : '#007bff',
-                    color: '#fff',
-                    borderRadius: '4px',
-                    cursor: loading ? 'not-allowed' : 'pointer',
-                    marginTop: '16px',
-                }}
+                className={`file-label ${loading ? 'disabled' : ''}`}
             >
                 Select Files
                 <input
@@ -120,7 +96,6 @@ const FileUploadSection = ({ title, onFilesChange, fileStatuses, loading, emptyR
                     accept="image/png, image/jpeg"
                     onChange={handleFileChange}
                     disabled={loading}
-                    style={{ display: 'none' }}
                 />
             </label>
         </div>
