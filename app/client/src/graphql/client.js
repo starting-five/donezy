@@ -1,3 +1,6 @@
+// File: client/src/graphql/client.js
+// Description: This file sets up the Apollo Client for interacting with a GraphQL server.
+
 import { ApolloClient, InMemoryCache } from '@apollo/client';
 
 const client = new ApolloClient({

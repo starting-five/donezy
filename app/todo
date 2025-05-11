@@ -1,9 +1,5 @@
-create graphql endpoint
-cereate models for users, logs, post
-flow:
-
-create a new log after successful login
-    check if user exist
-    if exist, add new entry to log
-
-if user create a new post, add entry to db
+TODO:
+1. Improve security by the following items:
+    - Remove connecting directly to AWS, instead, use pre-signed URLs for S3 communications
+    - On the server side, check the user with Auth0 before proceeding
+    

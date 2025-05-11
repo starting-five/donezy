@@ -1,3 +1,6 @@
+// File: server/config/db.js
+// Description: This file contains the MongoDB connection configuration using Mongoose.
+
 const mongoose = require('mongoose');
 require('dotenv').config(); // Load environment variables from .env file
 

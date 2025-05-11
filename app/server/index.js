@@ -1,3 +1,6 @@
+// File: server/index.js
+// Description: This file sets up the Express server and Apollo Server for GraphQL.
+
 // src/index.js
 const express = require('express');
 const { ApolloServer } = require('apollo-server-express');

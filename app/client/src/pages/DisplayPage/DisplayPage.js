@@ -1,68 +1,109 @@
-import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
-import FileDisplaySection from '../../components/FileDisplaySection/FileDisplaySection';
-import AWS from 'aws-sdk';
+// File: client/src/pages/DisplayPage/DisplayPage.js
+// Description: This file contains the DisplayPage component, which fetches and displays a post's details and images from AWS S3.
+
+import AWS from "aws-sdk";
+import React, { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+import { GET_POST_BY_POST_ID } from "../../graphql/queries/postQueries";
+import "./DisplayPage.css";
+
+import { useQuery } from "@apollo/client";
+import { Box } from "@mui/material";
+import ImageGallery from "../../components/ImageGallery/ImageGallery";
 
 const DisplayPage = () => {
-    const { uniqueID } = useParams(); // Get the unique ID from the URL
-    const [beforeImages, setBeforeImages] = useState([]); // State to store "before" image URLs
-    const [afterImages, setAfterImages] = useState([]); // State to store "after" image URLs
+  const { uniqueID } = useParams();
 
-    useEffect(() => {
-        const S3_BUCKET = process.env.REACT_APP_AWS_S3_BUCKET;
-        const REGION = process.env.REACT_APP_AWS_REGION;
-        
-        // Configure AWS SDK
-        AWS.config.update({
-            accessKeyId: process.env.REACT_APP_AWS_ACCESS_KEY_ID,
-            secretAccessKey: process.env.REACT_APP_AWS_SECRET_ACCESS_KEY,
-            region: REGION,
-        });
+  const {
+    loading: postLoading,
+    error: postError,
+    data: postData,
+  } = useQuery(GET_POST_BY_POST_ID, {
+    variables: { postId: uniqueID },
+  });
 
-        const s3 = new AWS.S3();
+  // Store images for each section
+  const [sectionImages, setSectionImages] = useState({});
 
-        // Fetch images from a specific folder
-        const fetchImagesFromFolder = async (folder) => {
-            try {
-                const params = {
-                    Bucket: S3_BUCKET,
-                    Prefix: `${uniqueID}/${folder}/`, // Path to the folder
-                };
+  useEffect(() => {
+    if (!postData || !postData.getPostByPostId?.postType?.sections) return;
 
-                const data = await s3.listObjectsV2(params).promise();
+    const S3_BUCKET = process.env.REACT_APP_AWS_S3_BUCKET;
+    const REGION = process.env.REACT_APP_AWS_REGION;
 
-                // Extract image URLs
-                return data.Contents.map((item) =>
-                    s3.getSignedUrl('getObject', {
-                        Bucket: S3_BUCKET,
-                        Key: item.Key,
-                        Expires: 3600, // URL expiration time in seconds
-                    })
-                );
-            } catch (error) {
-                console.error(`Error fetching images from ${folder}:`, error);
-                return [];
-            }
+    AWS.config.update({
+      accessKeyId: process.env.REACT_APP_AWS_ACCESS_KEY_ID,
+      secretAccessKey: process.env.REACT_APP_AWS_SECRET_ACCESS_KEY,
+      region: REGION,
+    });
+
+    const s3 = new AWS.S3();
+
+    // Fetch images for a single folder
+    const fetchImagesFromFolder = async (folder) => {
+      try {
+        const params = {
+          Bucket: S3_BUCKET,
+          Prefix: `uploads/${uniqueID}/${folder}/`,
         };
+        const data = await s3.listObjectsV2(params).promise();
+        return data.Contents.map((item) => ({
+          url: s3.getSignedUrl("getObject", {
+            Bucket: S3_BUCKET,
+            Key: item.Key,
+            Expires: 3600,
+          }),
+        }));
+      } catch (error) {
+        console.error(`Error fetching images from ${folder}:`, error);
+        return [];
+      }
+    };
 
-        const fetchAllImages = async () => {
-            const beforeImages = await fetchImagesFromFolder('before');
-            const afterImages = await fetchImagesFromFolder('after');
+    // Fetch images for all sections
+    const fetchAllSectionImages = async () => {
+      const sections = postData.getPostByPostId.postType.sections;
+      const imagesBySection = {};
 
-            setBeforeImages(beforeImages); // Update state with "before" images
-            setAfterImages(afterImages); // Update state with "after" images
-        };
+      await Promise.all(
+        sections.map(async (section, idx) => {
+          const images = await fetchImagesFromFolder(idx);
+          imagesBySection[idx] = images;
+        })
+      );
 
-        fetchAllImages();
-    }, [uniqueID]);
+      setSectionImages(imagesBySection);
+    };
 
-    return (
-        <div>
-            {/* Pass the title and images as props */}
-            <FileDisplaySection images={beforeImages} title="Before Pictures" />
-            <FileDisplaySection images={afterImages} title="After Pictures" />
-        </div>
-    );
+    fetchAllSectionImages();
+    console.log("Fetched images for sections:", sectionImages);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [postData, uniqueID]);
+
+  if (postLoading) return <div>Loading...</div>;
+  if (postError) return <div>Error: {postError.message}</div>;
+  if (!postData || !postData.getPostByPostId) return <div>No post found.</div>;
+
+  const { postType, comments } = postData.getPostByPostId;
+
+  return (
+    <div className="display-page">
+      {postType.sections.map((section, index) => (
+        <ImageGallery
+          key={section + index}
+          title={section}
+          sectionIndex={index}
+          images={sectionImages[index] || []}
+          showDeleteButton={false}
+          showSelectButton={false}
+        />
+      ))}
+
+      <Box className="display-comments-box">
+        {comments}
+      </Box>
+    </div>
+  );
 };
 
 export default DisplayPage;

@@ -1,9 +1,10 @@
+// File: server/graphql/schemas/logSchema.js
+// Description: This file contains the GraphQL schema for logs.
+
 const { gql } = require('apollo-server-express');
 
-// Define the User GraphQL type
+// Define the Log GraphQL type
 const logSchema = gql`
-scalar Date
-
   type Log {
     id: ID!
     userId: ID!  # Reference to the User ID

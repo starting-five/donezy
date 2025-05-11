@@ -1,3 +1,6 @@
+// File: server/models/Log.js
+// Description: This file contains the Mongoose schema and model for logs.
+
 const mongoose = require('mongoose');
 
 // Define the Log schema

@@ -1,0 +1,43 @@
+.post-type-settings {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  padding: 24px;
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+#addNewPostTypeBtn {
+  margin-top: 16px;
+  float: right;
+}
+
+.table-wrapper {
+  flex: 1;
+  overflow-y: auto;
+  margin-bottom: 24px;
+}
+
+
+/* Sticky header magic */
+thead th {
+  position: sticky;
+  top: 0;
+  background: white; /* Prevent transparency when scrolling */
+  z-index: 1; /* Make sure it sits above the scrollable body */
+  border-bottom: 2px solid #ccc;
+}
+
+.MuiTableCell-head {
+  font-weight: bold !important;
+}
+
+.add-image-section-btn {
+  margin-top: 8px;
+}
+
+.dialog-content-section {
+  display: flex;
+  align-items: center;
+  margin-bottom: 16px;
+}

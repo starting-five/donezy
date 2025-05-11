@@ -1,4 +1,6 @@
-// src/graphql/resolvers/userResolvers.js
+// File: server/graphql/resolvers/userResolvers.js
+// Description: This file contains GraphQL resolvers for user-related queries and mutations.
+
 const User = require('../../models/User');  // Import the User Mongoose model
 
 const userResolvers = {
@@ -8,7 +10,7 @@ const userResolvers = {
     },
 
     getUserById: async (_, { id }) => {
-      return await User.findById(id);  // Fetch a user by their ID
+      return await User.findOne(id);  // Fetch a user by their ID
     },
 
     getUserByEmail: async (_, { email }) => {
@@ -21,6 +23,13 @@ const userResolvers = {
       const newUser = new User({ name, username, email });  // Create a new user
       return await newUser.save();  // Save the user to the database
     },
+    updateUserCompany: async (_, { id, company }) => {
+      return await User.findByIdAndUpdate(
+        id,
+        { company },
+        { new: true }  // Return the updated user
+      );
+    }
   },
 };
 

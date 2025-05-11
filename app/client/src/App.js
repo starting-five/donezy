@@ -1,27 +1,28 @@
-// src/App.js
-import React from "react";
-import {
-  BrowserRouter as Router,
-  Route,
-  Routes,
-  Navigate,
-} from "react-router-dom";
-import LandingPage from "./pages/LandingPage/LandingPage"; // Assuming you have the LandingPage component
-import HomePage from "./pages/HomePage/HomePage";
-import Header from "./components/Header/Header"; // Assuming you have the Header component
+// File: client/src/App.js
+// Description: This file contains the main application component that sets up routing and authentication using Auth0.
+
 import { useAuth0 } from "@auth0/auth0-react";
-// import CreatePage from './pages/CreatePage/CreatePage';
-import HistoryPage from "./pages/HistoryPage/HistoryPage";
-import BottomNav from "./components/BottomNav/BottomNav";
-import UploadPage from "./pages/UploadPage/UploadPage"; // Assuming you have the UploadPage component
-import DisplayPage from "./pages/DisplayPage/DisplayPage";
+import React from "react";
 import { Provider } from "react-redux";
+import {
+  Navigate,
+  Route,
+  BrowserRouter as Router,
+  Routes,
+} from "react-router-dom";
+import BottomNav from "./components/BottomNav/BottomNav";
+import Header from "./components/Header/Header"; // Assuming you have the Header component
+import CreatePage from "./pages/CreatePage/CreatePage";
+import DisplayPage from "./pages/DisplayPage/DisplayPage";
+import HistoryPage from "./pages/HistoryPage/HistoryPage";
+import HomePage from "./pages/HomePage/HomePage";
+import LandingPage from "./pages/LandingPage/LandingPage"; // Assuming you have the LandingPage component
+import SettingsPage from "./pages/SettingsPage/SettingsPage"; // Assuming you have the SettingsPage component
 import store from "./redux/store"; // Assuming you have the Redux store set up
 
 const App = () => {
   const { loginWithRedirect, user, isAuthenticated, isLoading, logout } =
     useAuth0();
-
 
   const handleLogin = async () => {
     try {
@@ -34,16 +35,10 @@ const App = () => {
   };
 
   const handleLogout = () => {
-    // Handle logout logic here
-    console.log("Logout clicked");
     logout({ returnTo: window.location.origin });
   };
 
   const ProtectedRoute = ({ children }) => {
-    console.log("protected route");
-    console.log("isAuthenticated:", isAuthenticated);
-    console.log("isLoading:", isLoading);
-
     if (!isAuthenticated) {
       return <Navigate to="/" replace />; // Redirect to the landing page if not authenticated
     }
@@ -78,21 +73,23 @@ const App = () => {
               </ProtectedRoute>
             }
           />
-          {/* <Route path="/create" element={
-          <ProtectedRoute>
-            <CreatePage />
-          </ProtectedRoute>
-        }
-        /> */}
           <Route
             path="/create"
             element={
               <ProtectedRoute>
-                <UploadPage />
+                <CreatePage />
               </ProtectedRoute>
             }
           />
-          <Route path="/:uniqueID" element={<DisplayPage />} />
+          <Route
+            path="/settings"
+            element={
+              <ProtectedRoute>
+                <SettingsPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route path="/post/:uniqueID" element={<DisplayPage />} />
         </Routes>
         {isAuthenticated && <BottomNav />}
       </Router>

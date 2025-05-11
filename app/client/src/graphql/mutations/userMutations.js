@@ -1,3 +1,6 @@
+// File: client/src/graphql/mutations/userMutations.js
+// Description: This file contains the GraphQL mutations for creating a user and updating a user's company in the database.
+
 import { gql } from '@apollo/client';
 
 export const CREATE_USER = gql`
@@ -7,6 +10,18 @@ export const CREATE_USER = gql`
       name
       username
       email
+    }
+  }
+`;
+
+export const UPDATE_USER_COMPANY = gql`
+  mutation UpdateUserCompany($id: ID!, $company: String!) {
+    updateUserCompany(id: $id, company: $company) {
+      id
+      name
+      username
+      email
+      company
     }
   }
 `;

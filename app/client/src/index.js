@@ -1,3 +1,6 @@
+// File: client/src/index.js
+// Description: This is the entry point of the React application. It sets up the Apollo Client, Auth0 Provider, and renders the main App component.
+
 import React from "react";
 import ReactDOM from "react-dom/client";
 // import './index.scss';

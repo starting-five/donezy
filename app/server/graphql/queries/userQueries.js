@@ -1,4 +1,6 @@
-// src/graphql/queries/userQueries.js
+// File: server/graphql/queries/userQueries.js
+// Description: This file contains GraphQL queries for fetching users.
+
 const { gql } = require('apollo-server-express');
 
 // Define GraphQL queries for fetching users

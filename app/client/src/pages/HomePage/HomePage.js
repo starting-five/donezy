@@ -1,36 +1,48 @@
+// File: client/src/pages/HomePage/HomePage.js
+// Description: This file contains the HomePage component, which is responsible for displaying the user's information and handling user login/logout actions.
+
 import { useMutation, useQuery } from "@apollo/client";
 import { useAuth0 } from "@auth0/auth0-react";
-import React, { useEffect, useRef } from "react";
+import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { CREATE_LOG } from "../../graphql/mutations/logMutations";
 import { CREATE_USER } from "../../graphql/mutations/userMutations";
+import { GET_POST_TYPES_BY_USER_ID } from "../../graphql/queries/postTypeQueries";
 import { GET_USER_BY_EMAIL } from "../../graphql/queries/userQueries";
-import { setUserId } from "../../redux/actions/userActions";
+import { setPostTypes, setUser } from "../../redux/actions/settingsAction";
 
 const HomePage = () => {
-  const loggedInUserId = useSelector((state) => state.user.userId);
+  const loggedInUserId = useSelector(
+    (state) => state.settings.user && state.settings.user.id
+  );
   const { user, isAuthenticated } = useAuth0();
   const [createLog] = useMutation(CREATE_LOG);
   const [createUser] = useMutation(CREATE_USER);
 
-  const logCreatedRef = useRef(false);
   const dispatch = useDispatch();
 
   const {
     loading,
-    error,
     data: userData,
   } = useQuery(GET_USER_BY_EMAIL, {
     variables: { email: user.email },
     skip: !isAuthenticated, // Skip the query if not authenticated
   });
 
+  const {
+    data: postTypeData,
+  } = useQuery(GET_POST_TYPES_BY_USER_ID, {
+    skip: !userData,
+    variables: { userId: userData?.getUserByEmail.id },
+  });
+
+  const hasLogged = sessionStorage.getItem("hasLoggedIn");
+  const hasPostTypeFetched = sessionStorage.getItem("postTypesFetched");
+
   useEffect(() => {
     if (isAuthenticated && loggedInUserId == null) {
-      console.log("User ID in redux state is null");
       if (userData && userData.getUserByEmail) {
-        console.log("User ID is in database");
-        dispatch(setUserId(userData.getUserByEmail.id));
+        dispatch(setUser(userData.getUserByEmail));
       } else if (userData && !userData.getUserByEmail) {
         console.log("User ID is not in database");
         createUser({
@@ -44,13 +56,13 @@ const HomePage = () => {
           },
         }).then((response) => {
           console.log("User created successfully:", response);
-          dispatch(setUserId(response.data.createUser.id));
+          dispatch(setUser(response.data.createUser));
         });
       }
     } else if (isAuthenticated && loggedInUserId) {
       // Create a log entry when the user logs in
-      if (!logCreatedRef.current) {
-        logCreatedRef.current = true;
+      if (!hasLogged) {
+        sessionStorage.setItem("hasLoggedIn", true);
         createLog({
           variables: {
             userId: loggedInUserId,
@@ -66,6 +78,11 @@ const HomePage = () => {
           console.log("Log created successfully:", response.data.createLog);
         });
       }
+
+      if (postTypeData && !hasPostTypeFetched) {
+        dispatch(setPostTypes(postTypeData.getPostTypesByUserId));
+        sessionStorage.removeItem("postTypesFetched");
+      }
     }
   }, [
     isAuthenticated,
@@ -75,6 +92,9 @@ const HomePage = () => {
     dispatch,
     loggedInUserId,
     createLog,
+    postTypeData,
+    hasLogged,
+    hasPostTypeFetched,
   ]);
 
   return (

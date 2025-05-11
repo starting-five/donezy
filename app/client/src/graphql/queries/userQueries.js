@@ -1,3 +1,6 @@
+// File: client/src/graphql/queries/userQueries.js
+// Description: This file contains the GraphQL queries for fetching user data from the database.
+
 import { gql } from '@apollo/client';
 
 export const GET_USERS = gql`
@@ -18,6 +21,7 @@ export const GET_USER_BY_EMAIL = gql`
       name
       username
       email
+      company
     }
   }
 `;
@@ -29,6 +33,7 @@ export const GET_USER_BY_ID = gql`
       name
       username
       email
+      company
     }
   }
 `;

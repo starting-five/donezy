@@ -1,4 +1,6 @@
-// src/models/User.js
+// File: server/models/User.js
+// Description: This file contains the Mongoose schema and model for users.
+
 const mongoose = require('mongoose');
 
 // Define the User schema
@@ -18,6 +20,10 @@ const userSchema = new mongoose.Schema({
     required: true,
     unique: true,
   },
+  company: {
+    type: String,
+    required: false,
+  }
 });
 
 // Create and export the User model
