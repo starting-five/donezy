@@ -21,7 +21,7 @@ import SettingsPage from "./pages/SettingsPage/SettingsPage"; // Assuming you ha
 import store from "./redux/store"; // Assuming you have the Redux store set up
 
 const App = () => {
-  const { loginWithRedirect, user, isAuthenticated, isLoading, logout } =
+  const { loginWithRedirect, isAuthenticated, logout } =
     useAuth0();
 
   const handleLogin = async () => {

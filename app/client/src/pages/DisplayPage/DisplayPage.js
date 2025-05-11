@@ -1,7 +1,6 @@
 // File: client/src/pages/DisplayPage/DisplayPage.js
 // Description: This file contains the DisplayPage component, which fetches and displays a post's details and images from AWS S3.
 
-import AWS from "aws-sdk";
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { GET_POST_BY_POST_ID } from "../../graphql/queries/postQueries";
@@ -13,7 +12,7 @@ import ImageGallery from "../../components/ImageGallery/ImageGallery";
 
 const DisplayPage = () => {
   const { uniqueID } = useParams();
-
+  
   const {
     loading: postLoading,
     error: postError,
@@ -28,46 +27,21 @@ const DisplayPage = () => {
   useEffect(() => {
     if (!postData || !postData.getPostByPostId?.postType?.sections) return;
 
-    const S3_BUCKET = process.env.REACT_APP_AWS_S3_BUCKET;
-    const REGION = process.env.REACT_APP_AWS_REGION;
-
-    AWS.config.update({
-      accessKeyId: process.env.REACT_APP_AWS_ACCESS_KEY_ID,
-      secretAccessKey: process.env.REACT_APP_AWS_SECRET_ACCESS_KEY,
-      region: REGION,
-    });
-
-    const s3 = new AWS.S3();
-
-    // Fetch images for a single folder
-    const fetchImagesFromFolder = async (folder) => {
-      try {
-        const params = {
-          Bucket: S3_BUCKET,
-          Prefix: `uploads/${uniqueID}/${folder}/`,
-        };
-        const data = await s3.listObjectsV2(params).promise();
-        return data.Contents.map((item) => ({
-          url: s3.getSignedUrl("getObject", {
-            Bucket: S3_BUCKET,
-            Key: item.Key,
-            Expires: 3600,
-          }),
-        }));
-      } catch (error) {
-        console.error(`Error fetching images from ${folder}:`, error);
-        return [];
-      }
+    const fetchImagesFromSection = async (section) => {
+      const res = await fetch(
+        `http://localhost:4000/api/s3/list-images?postId=${uniqueID}&section=${section}`
+      );
+      const data = await res.json();
+      return data.images || [];
     };
 
-    // Fetch images for all sections
     const fetchAllSectionImages = async () => {
       const sections = postData.getPostByPostId.postType.sections;
       const imagesBySection = {};
 
       await Promise.all(
         sections.map(async (section, idx) => {
-          const images = await fetchImagesFromFolder(idx);
+          const images = await fetchImagesFromSection(idx);
           imagesBySection[idx] = images;
         })
       );
@@ -76,7 +50,6 @@ const DisplayPage = () => {
     };
 
     fetchAllSectionImages();
-    console.log("Fetched images for sections:", sectionImages);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [postData, uniqueID]);
 

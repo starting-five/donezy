@@ -44,5 +44,12 @@ async function startServer() {
   });
 }
 
+const cors = require('cors');
+app.use(cors({ origin: "http://localhost:3000" }));
+
+const s3Routes = require('./routes/s3');
+app.use(express.json()); // Needed for JSON body parsing
+app.use('/api/s3', s3Routes);
+
 // Start the Apollo Server and Express app
 startServer();

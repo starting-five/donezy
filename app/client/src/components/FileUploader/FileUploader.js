@@ -11,74 +11,66 @@ import {
   TableRow,
   Typography,
 } from "@mui/material";
-import { S3 } from "aws-sdk";
 import React, { useEffect, useRef, useState } from "react";
 import "./FileUploader.css";
 
 const FileUploader = ({ files, onUploadComplete }) => {
   const [uploading, setUploading] = useState(true); // Track if files are being uploaded
   const [fileStatuses, setFileStatuses] = useState([]); // Track file statuses and progress
-  const [setCompletedCount] = useState(0); // Track number of completed uploads
+  // eslint-disable-next-line no-unused-vars
+  const [completedCount, setCompletedCount] = useState(0); // Track number of completed uploads
   const callbackCalledRef = useRef(false); // Prevent multiple callback calls
 
-  const s3 = new S3({
-    region: process.env.REACT_APP_AWS_REGION,
-    credentials: {
-      accessKeyId: process.env.REACT_APP_AWS_ACCESS_KEY_ID,
-      secretAccessKey: process.env.REACT_APP_AWS_SECRET_ACCESS_KEY,
-    },
-  });
+  // Function to get a presigned URL from your backend
+  const getPresignedUrl = async (file) => {
+    const res = await fetch("http://localhost:4000/api/s3/presign", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        filename: file.s3Url,
+        contentType: file.file.type,
+      }),
+    });
+    const data = await res.json();
+    return data.url;
+  };
 
-  // Function to upload a file to S3
-  const uploadFile = (file, index) => {
-    return new Promise((resolve, reject) => {
-      const params = {
-        Bucket: process.env.REACT_APP_AWS_S3_BUCKET,
-        Key: `uploads/${file.s3Url}`,
-        Body: file.file,
-        ContentType: file.file.type,
-      };
+  // Function to upload a file to S3 using the presigned URL
+  const uploadFile = async (file, index) => {
+    setFileStatuses((prevStatuses) => {
+      const newStatuses = [...prevStatuses];
+      newStatuses[index] = { status: "uploading", progress: 0 };
+      return newStatuses;
+    });
 
-      const upload = s3.upload(params);
+    try {
+      const presignedUrl = await getPresignedUrl(file);
 
-      // Set initial status to "uploading"
+      // Use fetch to PUT the file to S3
+      const response = await fetch(presignedUrl, {
+        method: "PUT",
+        headers: {
+          "Content-Type": file.file.type,
+        },
+        body: file.file,
+      });
+
+      if (!response.ok) throw new Error("Upload failed");
+
       setFileStatuses((prevStatuses) => {
         const newStatuses = [...prevStatuses];
-        newStatuses[index] = { status: "uploading", progress: 0 };
+        newStatuses[index] = { status: "uploaded", progress: 100 };
         return newStatuses;
       });
-
-      // Track upload progress
-      upload.on("httpUploadProgress", (event) => {
-        const progress = Math.round((event.loaded / event.total) * 100);
-
-        // Update progress as it happens
-        setFileStatuses((prevStatuses) => {
-          const newStatuses = [...prevStatuses];
-          // Only update the progress value if it is different from the last progress
-          if (newStatuses[index].progress !== progress) {
-            newStatuses[index] = { ...newStatuses[index], progress };
-          }
-          return newStatuses;
-        });
+      return true;
+    } catch (err) {
+      setFileStatuses((prevStatuses) => {
+        const newStatuses = [...prevStatuses];
+        newStatuses[index] = { status: "error", progress: 100 };
+        return newStatuses;
       });
-
-      // Complete or error handling
-      upload.send((err, data) => {
-        const status = err ? "error" : "uploaded";
-        setFileStatuses((prevStatuses) => {
-          const newStatuses = [...prevStatuses];
-          newStatuses[index] = { status, progress: 100 }; // 100% progress when finished
-          return newStatuses;
-        });
-
-        if (err) {
-          reject(err); // Reject if an error occurs
-        } else {
-          resolve(data); // Resolve when upload is successful
-        }
-      });
-    });
+      return false;
+    }
   };
 
   // Start uploading files sequentially
@@ -88,29 +80,25 @@ const FileUploader = ({ files, onUploadComplete }) => {
       let tempCompletedCount = 0; // Track completed uploads locally
 
       for (let i = 0; i < files.length; i++) {
-        // If any file fails, stop the upload process immediately
         await uploadFile(files[i], i);
         tempCompletedCount++; // Increment completed uploads outside the state
       }
 
-      // Set the completed count after all files are uploaded
       setCompletedCount(tempCompletedCount);
 
-      // After all uploads are completed, finalize the callback
       if (!callbackCalledRef.current) {
         callbackCalledRef.current = true;
-        setUploading(false); // All uploads completed
+        setUploading(false);
 
-        // const uploadedCount = fileStatuses.filter((status) => status.status === 'uploaded').length;
         const errorCount = fileStatuses.filter(
           (status) => status.status === "error"
         ).length;
 
         if (onUploadComplete) {
           if (errorCount === 0) {
-            onUploadComplete(true); // All files uploaded successfully
+            onUploadComplete(true);
           } else {
-            onUploadComplete(false); // Some files failed
+            onUploadComplete(false);
           }
         }
       }
@@ -118,29 +106,36 @@ const FileUploader = ({ files, onUploadComplete }) => {
       console.error("File upload stopped due to error:", error);
       if (!callbackCalledRef.current) {
         callbackCalledRef.current = true;
-        setUploading(false); // Stop uploading
+        setUploading(false);
 
         if (onUploadComplete) {
-          onUploadComplete(false); // Callback with failure due to error
+          onUploadComplete(false);
         }
       }
     }
   };
 
-  // Trigger uploading when files prop changes (only once per change)
   useEffect(() => {
     if (files.length > 0 && !callbackCalledRef.current) {
-      setFileStatuses(files.map(() => ({ status: "pending", progress: 0 }))); // Initialize statuses
-      startUploading(); // Start the upload process
+      setFileStatuses(files.map(() => ({ status: "pending", progress: 0 })));
+      startUploading();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [files]); // This will trigger only when `files` changes
+  }, [files]);
+
+  useEffect(() => {
+    if (!uploading && fileStatuses.length === files.length && !callbackCalledRef.current) {
+      callbackCalledRef.current = true;
+      const errorCount = fileStatuses.filter((status) => status.status === "error").length;
+      if (onUploadComplete) {
+        onUploadComplete(errorCount === 0);
+      }
+    }
+  }, [uploading, fileStatuses, files.length, onUploadComplete]);
 
   return (
     <div className="file-uploader-container">
       <Typography variant="h6">File Upload</Typography>
-
-      {/* Display file status in a table */}
       <TableContainer className="file-uploader-table">
         <Table>
           <TableHead>
@@ -175,8 +170,6 @@ const FileUploader = ({ files, onUploadComplete }) => {
           </TableBody>
         </Table>
       </TableContainer>
-
-      {/* Show the number of successful and failed uploads */}
       {!uploading && (
         <div>
           <Typography variant="body2" className="file-uploader-success">
