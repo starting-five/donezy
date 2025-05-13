@@ -10,6 +10,10 @@ import { CREATE_USER } from "../../graphql/mutations/userMutations";
 import { GET_POST_TYPES_BY_USER_ID } from "../../graphql/queries/postTypeQueries";
 import { GET_USER_BY_EMAIL } from "../../graphql/queries/userQueries";
 import { setPostTypes, setUser } from "../../redux/actions/settingsAction";
+import Typography from "@mui/material/Typography";
+import Card from "@mui/material/Card";
+import CardContent from "@mui/material/CardContent";
+import CircularProgress from "@mui/material/CircularProgress";
 
 const HomePage = () => {
   const loggedInUserId = useSelector(
@@ -26,7 +30,7 @@ const HomePage = () => {
     data: userData,
   } = useQuery(GET_USER_BY_EMAIL, {
     variables: { email: user.email },
-    skip: !isAuthenticated, // Skip the query if not authenticated
+    skip: !isAuthenticated,
   });
 
   const {
@@ -44,7 +48,6 @@ const HomePage = () => {
       if (userData && userData.getUserByEmail) {
         dispatch(setUser(userData.getUserByEmail));
       } else if (userData && !userData.getUserByEmail) {
-        console.log("User ID is not in database");
         createUser({
           variables: {
             name: user.name,
@@ -55,12 +58,10 @@ const HomePage = () => {
             console.error("Error creating user", error);
           },
         }).then((response) => {
-          console.log("User created successfully:", response);
           dispatch(setUser(response.data.createUser));
         });
       }
     } else if (isAuthenticated && loggedInUserId) {
-      // Create a log entry when the user logs in
       if (!hasLogged) {
         sessionStorage.setItem("hasLoggedIn", true);
         createLog({
@@ -71,11 +72,6 @@ const HomePage = () => {
           onError: (error) => {
             console.error("Error logging user login", error);
           },
-          onCompleted: (response) => {
-            console.log("Log created successfully:", response);
-          },
-        }).then((response) => {
-          console.log("Log created successfully:", response.data.createLog);
         });
       }
 
@@ -97,14 +93,39 @@ const HomePage = () => {
     hasPostTypeFetched,
   ]);
 
+  if (loading) {
+    return (
+      <div style={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "60vh" }}>
+        <CircularProgress />
+      </div>
+    );
+  }
+
   return (
-    <div className="container">
-      <h1 className="title">Welcome back!</h1>
-      {!loading && (
-        <div key={user.id} className="user-card">
-          <h2>{user.name}</h2>
-          <p>Email: {user.email}</p>
-        </div>
+    <div
+      className="container"
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        minHeight: "80vh",
+      }}
+    >
+      <Typography variant="h3" component="h1" className="title" gutterBottom>
+        Welcome back!
+      </Typography>
+      {user && (
+        <Card sx={{ minWidth: 320, mt: 3, boxShadow: 3 }}>
+          <CardContent>
+            <Typography variant="h5" component="h2" gutterBottom>
+              {user.name}
+            </Typography>
+            <Typography variant="body1" color="text.secondary">
+              Email: {user.email}
+            </Typography>
+          </CardContent>
+        </Card>
       )}
     </div>
   );

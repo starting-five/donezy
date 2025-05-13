@@ -2,17 +2,18 @@
 // Description: This file contains the DisplayPage component, which fetches and displays a post's details and images from AWS S3.
 
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { GET_POST_BY_POST_ID } from "../../graphql/queries/postQueries";
 import "./DisplayPage.css";
 
 import { useQuery } from "@apollo/client";
-import { Box } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 import ImageGallery from "../../components/ImageGallery/ImageGallery";
 
 const DisplayPage = () => {
   const { uniqueID } = useParams();
-  
+  const navigate = useNavigate();
+
   const {
     loading: postLoading,
     error: postError,
@@ -29,7 +30,7 @@ const DisplayPage = () => {
 
     const fetchImagesFromSection = async (section) => {
       const res = await fetch(
-        `http://localhost:4000/api/s3/list-images?postId=${uniqueID}&section=${section}`
+        `${process.env.REACT_APP_API_SERVER_URL}/api/s3/list-images?postId=${uniqueID}&section=${section}`
       );
       const data = await res.json();
       return data.images || [];
@@ -53,6 +54,14 @@ const DisplayPage = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [postData, uniqueID]);
 
+  useEffect(() => {
+    if (!postLoading && postData && !postData.getPostByPostId) {
+      navigate("/");
+    }
+  }, [postLoading, postData, navigate]);
+
+  console.log("post data", postData);
+
   if (postLoading) return <div>Loading...</div>;
   if (postError) return <div>Error: {postError.message}</div>;
   if (!postData || !postData.getPostByPostId) return <div>No post found.</div>;
@@ -72,9 +81,26 @@ const DisplayPage = () => {
         />
       ))}
 
-      <Box className="display-comments-box">
-        {comments}
-      </Box>
+      {comments && comments.length > 0 && (
+        <Box
+          className="display-comments-box"
+          sx={{
+            mt: 4,
+            maxWidth: 600,
+            mx: "auto",
+            p: 2,
+            backgroundColor: "background.paper",
+            borderRadius: 2,
+            boxShadow: 1,
+            borderLeft: "4px solid",
+            borderColor: "primary.main",
+          }}
+        >
+          <Typography variant="body1" color="text.primary">
+            {comments}
+          </Typography>
+        </Box>
+      )}
     </div>
   );
 };

@@ -51,8 +51,23 @@ const PreviewPage = ({ postType, sectionImages, comment }) => {
         />
       ))}
       {comment && (
-        <Box className="preview-comment-box">
-          {comment}
+        <Box
+          className="preview-comment-box"
+          sx={{
+            mt: 3,
+            maxWidth: 600,
+            mx: "auto",
+            p: 2,
+            backgroundColor: "background.paper",
+            borderRadius: 2,
+            boxShadow: 1,
+            borderLeft: "4px solid",
+            borderColor: "primary.main",
+          }}
+        >
+          <Typography variant="body1" color="text.primary">
+            {comment}
+          </Typography>
         </Box>
       )}
     </div>

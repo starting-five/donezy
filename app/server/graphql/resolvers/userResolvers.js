@@ -9,21 +9,25 @@ const userResolvers = {
       return await User.find();  // Fetch all users
     },
 
-    getUserById: async (_, { id }) => {
+    getUserById: async (_, { id }, context) => {
+      if (!context.user) throw new Error("Not authenticated");
       return await User.findOne(id);  // Fetch a user by their ID
     },
 
-    getUserByEmail: async (_, { email }) => {
+    getUserByEmail: async (_, { email }, context) => {
+      if (!context.user) throw new Error("Not authenticated");
       return await User.findOne({ email });  // Fetch a user by their email
     },
   },
 
   Mutation: {
-    createUser: async (_, { name, username, email }) => {
+    createUser: async (_, { name, username, email }, context) => {
+      if (!context.user) throw new Error("Not authenticated");
       const newUser = new User({ name, username, email });  // Create a new user
       return await newUser.save();  // Save the user to the database
     },
-    updateUserCompany: async (_, { id, company }) => {
+    updateUserCompany: async (_, { id, company }, context) => {
+      if (!context.user) throw new Error("Not authenticated");
       return await User.findByIdAndUpdate(
         id,
         { company },

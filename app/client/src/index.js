@@ -3,32 +3,40 @@
 
 import React from "react";
 import ReactDOM from "react-dom/client";
-// import './index.scss';
 import App from "./App";
-// import { MantineProvider } from '@mantine/core';
-import {
-  ApolloProvider
-} from "@apollo/client";
 import { Auth0Provider } from "@auth0/auth0-react";
-import client from "./graphql/client";
+import ApolloProviderWithAuth from "./graphql/ApolloProviderWithAuth";
+import { ThemeProvider, createTheme } from '@mui/material/styles';
+
+const theme = createTheme({
+  palette: {
+    primary: { main: '#2774AE' }, // UCLA Blue
+    secondary: { main: '#FFD100' }, // UCLA Gold (optional, for accents)
+    background: { default: '#f5f5f5' },
+  },
+  shape: { borderRadius: 12 },
+  typography: {
+    fontFamily: 'Montserrat, Arial, sans-serif',
+  },
+});
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
-console.log("Environment Variables:", process.env);
-console.log("Auth0 Domain:", process.env.REACT_APP_AUTH0_DOMAIN);
-console.log("Auth0 Client ID:", process.env.REACT_APP_AUTH0_CLIENT_ID);
 root.render(
   <React.StrictMode>
-    <ApolloProvider client={client}>
-      <Auth0Provider
-        domain={process.env.REACT_APP_AUTH0_DOMAIN}
-        clientId={process.env.REACT_APP_AUTH0_CLIENT_ID}
-        authorizationParams={{
-          redirect_uri: window.location.origin,
-        }}
-      >
+    <Auth0Provider
+      domain={process.env.REACT_APP_AUTH0_DOMAIN}
+      clientId={process.env.REACT_APP_AUTH0_CLIENT_ID}
+      authorizationParams={{
+        redirect_uri: window.location.origin,
+        audience: process.env.REACT_APP_AUTH0_AUDIENCE,
+      }}
+    >
+      <ApolloProviderWithAuth>
+        <ThemeProvider theme={theme}>
         <App />
-      </Auth0Provider>
-    </ApolloProvider>
+        </ThemeProvider>
+      </ApolloProviderWithAuth>
+    </Auth0Provider>
   </React.StrictMode>
 );
 

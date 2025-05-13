@@ -23,7 +23,7 @@ const FileUploader = ({ files, onUploadComplete }) => {
 
   // Function to get a presigned URL from your backend
   const getPresignedUrl = async (file) => {
-    const res = await fetch("http://localhost:4000/api/s3/presign", {
+    const res = await fetch(`${process.env.REACT_APP_API_SERVER_URL}/api/s3/presign`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({

@@ -113,12 +113,12 @@ const CreatePage = () => {
           <Typography variant="body2">
             The link to your post is:{" "}
             <Link
-              href={`http://localhost:3000/post/${uniqueId}`}
+              href={`${process.env.REACT_APP_CLIENT_URL}/post/${uniqueId}`}
               target="_blank"
               rel="noopener noreferrer"
               color="inherit"
             >
-              {`localhost:3000/post/${uniqueId}`}
+              {`${process.env.REACT_APP_CLIENT_URL}/post/${uniqueId}`}
             </Link>
           </Typography>
         </>

@@ -13,6 +13,8 @@ import {
   TableHead,
   TableRow,
   CircularProgress,
+  Typography,
+  Box,
 } from "@mui/material";
 import React, { useState } from "react";
 import { useSelector } from "react-redux";
@@ -60,16 +62,45 @@ export const HistoryPage = () => {
   };
 
   return (
-    <div className="container">
-      <h1 className="title">History Page</h1>
-      {error && <p>Error: {error.message}</p>}
-      <TableContainer component={Paper}>
+    <Box
+      className="container"
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        minHeight: "80vh",
+        backgroundColor: "background.default",
+        padding: 3,
+      }}
+    >
+      <Typography variant="h3" component="h1" className="title" gutterBottom>
+        History Page
+      </Typography>
+      {error && (
+        <Typography color="error" sx={{ mb: 2 }}>
+          Error: {error.message}
+        </Typography>
+      )}
+      <TableContainer component={Paper} sx={{ maxWidth: 900, mb: 3 }}>
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell>Post Type Title</TableCell>
-              <TableCell>Post ID</TableCell>
-              <TableCell>{`Timestamp (${userTimeZone})`}</TableCell>
+              <TableCell>
+                <Typography variant="subtitle2" sx={{ fontWeight: "bold" }}>
+                  Post Type Title
+                </Typography>
+              </TableCell>
+              <TableCell>
+                <Typography variant="subtitle2" sx={{ fontWeight: "bold" }}>
+                  Post ID
+                </Typography>
+              </TableCell>
+              <TableCell>
+                <Typography variant="subtitle2" sx={{ fontWeight: "bold" }}>
+                  {`Timestamp (${userTimeZone})`}
+                </Typography>
+              </TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -86,12 +117,13 @@ export const HistoryPage = () => {
                   <TableCell>{post.postType?.title || ""}</TableCell>
                   <TableCell>
                     <Link
-                      href={`http://localhost:3000/post/${post.postId}`}
+                      href={`/post/${post.postId}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       color="primary"
+                      underline="hover"
                     >
-                      {`localhost:3000/post/${post.postId}`}
+                      {`${post.postId}`}
                     </Link>
                   </TableCell>
                   <TableCell>{toLocalTime(post.timestamp)}</TableCell>
@@ -100,14 +132,16 @@ export const HistoryPage = () => {
             ) : (
               <TableRow>
                 <TableCell colSpan={3} align="center">
-                  No posts found.
+                  <Typography variant="body2" color="text.secondary">
+                    No posts found.
+                  </Typography>
                 </TableCell>
               </TableRow>
             )}
           </TableBody>
         </Table>
       </TableContainer>
-      <div className="history-pagination">
+      <Box className="history-pagination" sx={{ display: "flex", gap: 2 }}>
         <Button
           variant="contained"
           onClick={handlePrevious}
@@ -127,8 +161,8 @@ export const HistoryPage = () => {
         >
           Next
         </Button>
-      </div>
-    </div>
+      </Box>
+    </Box>
   );
 };
 

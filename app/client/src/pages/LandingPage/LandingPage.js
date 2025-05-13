@@ -5,7 +5,9 @@ import { useAuth0 } from "@auth0/auth0-react";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import CircularProgress from "@mui/material/CircularProgress";
-import "./LandingPage.css"; // Import the SCSS file
+import Typography from "@mui/material/Typography";
+import Button from "@mui/material/Button";
+import "./LandingPage.css";
 
 const LandingPage = ({ handleLogin }) => {
   const navigate = useNavigate();
@@ -21,7 +23,6 @@ const LandingPage = ({ handleLogin }) => {
       try {
         const token = await getAccessTokenSilently();
         console.log("Access Token:", token);
-        // You can now use this token to call your API
       } catch (e) {
         console.error("Error getting token", e);
       }
@@ -42,19 +43,24 @@ const LandingPage = ({ handleLogin }) => {
   }
 
   return (
-    <div className="container">
+    <div className="container" style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", minHeight: "80vh" }}>
       {!isAuthenticated && (
         <>
-          <h1 className="title">Welcome to Donezy</h1>
-          <p className="subtitle">
-            Easily upload and showcase your <strong>before</strong> and{" "}
-            <strong>after</strong> pictures to impress your customers.
-          </p>
-          {!isAuthenticated && (
-            <button className="login-button" onClick={handleLogin}>
-              Login with Auth0
-            </button>
-          )}
+          <Typography variant="h3" component="h1" className="title">
+            Welcome to Donezy
+          </Typography>
+          <Typography variant="h6" className="subtitle" gutterBottom>
+            Because done deserves to be seen!
+          </Typography>
+          <Button
+            variant="contained"
+            color="primary"
+            className="login-button"
+            onClick={handleLogin}
+            sx={{ mt: 4, minWidth: 200 }}
+          >
+            Login with Auth0
+          </Button>
         </>
       )}
     </div>
