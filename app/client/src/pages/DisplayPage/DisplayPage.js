@@ -60,8 +60,6 @@ const DisplayPage = () => {
     }
   }, [postLoading, postData, navigate]);
 
-  console.log("post data", postData);
-
   if (postLoading) return <div>Loading...</div>;
   if (postError) return <div>Error: {postError.message}</div>;
   if (!postData || !postData.getPostByPostId) return <div>No post found.</div>;
@@ -70,6 +68,25 @@ const DisplayPage = () => {
 
   return (
     <div className="display-page">
+      {
+        postData.getPostByPostId.user.company?.trim() !== "" && (
+          <Box
+            className="user-info-box"
+            sx={{
+              mb: 4,
+              maxWidth: 600,
+              mx: "auto",
+              p: 1,
+              backgroundColor: "background.paper",
+              borderRadius: 1
+            }}
+          >
+            <Typography variant="h5" color="text.primary">
+              {postData.getPostByPostId.user.company}
+            </Typography>
+          </Box>
+        )
+      }
       {postType.sections.map((section, index) => (
         <ImageGallery
           key={section + index}

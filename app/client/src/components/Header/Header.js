@@ -12,12 +12,13 @@ import {
   ListItemText,
   Menu,
   MenuItem,
-  Toolbar, Typography
+  Toolbar
 } from "@mui/material";
 import React, { useState } from "react";
 import { useDispatch } from "react-redux";
 import { toggleSettingsModal } from "../../redux/actions/settingsAction";
 import "./Header.css"; // Import the CSS file for styling
+import { useLocation } from "react-router-dom";
 
 import SettingsPage from "../../pages/SettingsPage/SettingsPage";
 
@@ -46,16 +47,20 @@ const Header = ({ productName, onLogout }) => {
     onLogout(); // Call the onLogout function passed as a prop
   };
 
+  const location = useLocation();
+
   return (
     <AppBar position="fixed">
       <Toolbar>
-        <Box sx={{ flexGrow: 1 }}>
-          <Typography variant="h6" component="div">
-            {productName}
-          </Typography>
+        <Box sx={{ flexGrow: 1, display: "flex", alignItems: "center" }}>
+          <img
+            src="/donezy_label.png" 
+            alt="donezy logo"
+            style={{ height: 36, marginRight: 12, borderRadius: 4 }}
+          />
         </Box>
 
-        {isAuthenticated && (
+        {isAuthenticated && !location.pathname.startsWith("/post") && (
           <IconButton onClick={handleClick} color="inherit">
             <MenuIcon />
           </IconButton>

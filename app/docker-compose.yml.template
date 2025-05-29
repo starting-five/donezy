@@ -1,0 +1,32 @@
+version: "3.8"
+services:
+  client:
+    build: ./client
+    image: donezy-client:beta-001
+    ports:
+      - "3000:80"
+    environment:
+      - REACT_APP_AUTH0_DOMAIN=
+      - REACT_APP_AUTH0_CLIENT_ID=
+      - REACT_APP_AUTH0_AUDIENCE=
+      - REACT_APP_GRAPHQL_SERVER_URL=
+      - REACT_APP_API_SERVER_URL=
+      - REACT_APP_CLIENT_URL=
+    depends_on:
+      - server
+
+  server:
+    build: ./server
+    image: donezy-server:beta-001
+    expose:
+      - "4000"
+    environment:
+      - MONGO_URI=
+      - AWS_ACCESS_KEY_ID=
+      - AWS_SECRET_ACCESS_KEY=+G3Cm
+      - AWS_S3_BUCKET=
+      - AWS_REGION=
+      - AUTH0_AUDIENCE=
+      - AUTH0_DOMAIN=
+      - PORT=4000
+

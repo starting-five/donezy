@@ -8,6 +8,7 @@ require('dotenv').config();
 const cors = require('cors');
 const jwt = require("jsonwebtoken");
 const jwksRsa = require("jwks-rsa");
+const path = require('path');
 
 // Import the GraphQL type definitions and resolvers
 const { typeDefs, resolvers } = require('./graphql');
@@ -82,7 +83,7 @@ async function startServer() {
 
   // Apply Apollo Server middleware to Express app
   server.applyMiddleware({ app });
-  
+
   // Health check endpoint
   app.get('/health', (req, res) => {
     res.status(200).send('OK');

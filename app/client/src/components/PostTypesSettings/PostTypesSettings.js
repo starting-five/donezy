@@ -87,7 +87,7 @@ const PostTypesSettings = () => {
         console.error("Error adding post type", error);
       },
       onCompleted: (response) => {
-        console.log("Post type added successfully: ", response);
+        // console.log("Post type added successfully: ", response);
         const newPostType = response.createPostType;
         delete newPostType.userId;
         dispatch(addPostType(newPostType));
@@ -99,7 +99,6 @@ const PostTypesSettings = () => {
     setOpenDialog(false);
   };
 
-  console.log("before return");
   return (
     <div className="post-type-settings">
       <div className="table-wrapper">

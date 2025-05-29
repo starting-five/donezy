@@ -15,7 +15,6 @@ const ApolloProviderWithAuth = ({ children }) => {
     try {
       if (isAuthenticated) {
         token = await getAccessTokenSilently();
-        console.log("Token:", token);
       }
     } catch (e) {
       token = "";

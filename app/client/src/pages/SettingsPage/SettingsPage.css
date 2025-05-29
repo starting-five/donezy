@@ -76,3 +76,25 @@
         width: 180px;
     }
 }
+
+@media only screen and (max-width: 600px) {
+    #settings-drawer,
+    #settings-drawer .MuiDrawer-paper {
+        width: 115px !important;
+        height: 100vh;
+    }
+
+    .settings-content-area {
+        /* padding: 20px; */
+        display: flex;
+        width: 100%;
+        height: 100%;
+        overflow-y: auto;
+        box-sizing: border-box;
+    }
+
+    #settings-modal .MuiDialog-paper {
+        height: 100% !important;
+        margin: 0;
+    }
+}

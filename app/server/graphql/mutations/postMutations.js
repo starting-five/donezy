@@ -6,7 +6,7 @@ const { gql } = require("apollo-server-express");
 // Define GraphQL mutations for creating a post
 const postMutations = gql`
   type Mutation {
-    createPost(userId: ID!, postId: String!, postTypeId: ID!, comments: String): Post
+    createPost(userId: ID!, postId: String!, postTypeId: ID!, comments: String, internalMemo: String): Post
   }
 `;
 

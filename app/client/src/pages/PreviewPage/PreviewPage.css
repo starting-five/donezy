@@ -1,6 +1,6 @@
 .preview-page {
   max-width: 700px;
-  margin: 32px auto;
+  /* margin: 32px auto; */
   padding: 24px;
   background: #f9f9f9;
   border-radius: 12px;
@@ -40,4 +40,10 @@
   white-space: pre-wrap;
   color: inherit;
   min-height: 72px;
+}
+
+@media only screen and (max-width: 600px) {
+  #preview-comment {
+      width: 80vw;
+  } 
 }

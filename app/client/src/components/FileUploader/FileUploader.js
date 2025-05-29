@@ -75,13 +75,18 @@ const FileUploader = ({ files, onUploadComplete }) => {
 
   // Start uploading files sequentially
   const startUploading = async () => {
+    // console.log("Starting upload...");
     try {
       setUploading(true);
       let tempCompletedCount = 0; // Track completed uploads locally
 
       for (let i = 0; i < files.length; i++) {
-        await uploadFile(files[i], i);
-        tempCompletedCount++; // Increment completed uploads outside the state
+        const uploadFileResponse = await uploadFile(files[i], i);
+        if(uploadFileResponse) {
+          tempCompletedCount++; // Increment completed uploads outside the state
+        } else {
+          throw new Error("Upload failed");
+        }
       }
 
       setCompletedCount(tempCompletedCount);

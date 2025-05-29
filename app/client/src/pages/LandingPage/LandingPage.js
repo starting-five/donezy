@@ -15,24 +15,13 @@ const LandingPage = ({ handleLogin }) => {
   const {
     isAuthenticated,
     isLoading,
-    getAccessTokenSilently,
   } = useAuth0();
 
   useEffect(() => {
-    const getToken = async () => {
-      try {
-        const token = await getAccessTokenSilently();
-        console.log("Access Token:", token);
-      } catch (e) {
-        console.error("Error getting token", e);
-      }
-    };
-
     if (isAuthenticated) {
-      getToken();
       navigate("/home");
     }
-  }, [getAccessTokenSilently, isAuthenticated, navigate]);
+  }, [isAuthenticated, navigate]);
 
   if (isLoading) {
     return (

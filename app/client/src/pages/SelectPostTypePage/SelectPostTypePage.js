@@ -25,7 +25,7 @@ const SelectPostTypePage = ({ postType, handleRadioChange }) => {
 
   return (
     <Box
-      className="select-post-type-page"
+      id="select-post-type-page"
       sx={{
         display: "flex",
         flexDirection: "column",
@@ -37,7 +37,7 @@ const SelectPostTypePage = ({ postType, handleRadioChange }) => {
         pt: 8, // Add some padding to the top for spacing
       }}
     >
-      <Paper elevation={3} sx={{ p: 4, minWidth: 350, maxWidth: 500 }}>
+      <Paper elevation={3} sx={{ p: 4, minWidth: 330, maxWidth: 500 }}>
         <FormControl component="fieldset" sx={{ width: "100%" }}>
           <FormLabel
             id="select-post-type-group-label"

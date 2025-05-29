@@ -14,6 +14,7 @@ export const GET_POSTS_BY_USER_ID = gql`
         title
         sections
       }
+      internalMemo
     }
   }
 `;
@@ -21,17 +22,11 @@ export const GET_POSTS_BY_USER_ID = gql`
 export const GET_POST_BY_POST_ID = gql`
   query GetPostByPostId($postId: ID!) {
     getPostByPostId(postId: $postId) {
-      userId
-      postTypeId
       comments
       user {
-        id
-        name
-        email
+        company
       }
       postType {
-        id
-        title
         sections
       }
       timestamp

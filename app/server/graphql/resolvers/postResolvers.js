@@ -26,11 +26,11 @@ const postResolvers = {
   Mutation: {
     createPost: async (
       parent,
-      { userId, postId, postTypeId, comments },
+      { userId, postId, postTypeId, comments, internalMemo },
       context
     ) => {
       if (!context.user) throw new Error("Not authenticated");
-      const newPost = new Post({ userId, postId, postTypeId, comments }); // Create a new post
+      const newPost = new Post({ userId, postId, postTypeId, comments, internalMemo }); // Create a new post
       return await newPost.save(); // Save the post to the database
     },
   },

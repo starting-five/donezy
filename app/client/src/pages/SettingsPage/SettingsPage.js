@@ -1,5 +1,5 @@
 import CloseIcon from "@mui/icons-material/Close";
-import { Box, Drawer, List, ListItem, ListItemText } from "@mui/material";
+import { Box, Drawer, List, ListItem, ListItemText, ListItemButton } from "@mui/material";
 import Dialog from "@mui/material/Dialog";
 import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
@@ -62,19 +62,17 @@ export default function CustomizedDialogs() {
               <Box id="settings-box">
                 <List id="settings-list">
                   {["Profile", "Post Types"].map((text) => (
-                    <ListItem
-                      button
-                      key={text}
-                      onClick={() => handleSectionChange(text)}
-                    >
-                      <ListItemText primary={text} />
+                    <ListItem key={text} disablePadding>
+                      <ListItemButton onClick={() => handleSectionChange(text)}>
+                        <ListItemText primary={text} />
+                      </ListItemButton>
                     </ListItem>
                   ))}
                 </List>
               </Box>
             </Drawer>
             <Box className="settings-content-area">
-              <Box sx={{ width: "100%" }}>
+              <Box>
                 {selectedSection === "Profile" && <ProfileSection />}
                 {selectedSection === "Post Types" && <PostTypesSettings />}
               </Box>

@@ -48,8 +48,7 @@ const ProfileSection = () => {
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    // Handle form submission logic here
-    console.log("Form submitted:", formData);
+
     updateUserCompany({
       variables: {
         id: id,
@@ -59,7 +58,6 @@ const ProfileSection = () => {
         console.error("Error updating user company", error);
       },
       onCompleted: (response) => {
-        console.log("User company updated successfully:", response);
         dispatch(setUserCompany(response.updateUserCompany.company));
         setOriginalCompanyName(response.updateUserCompany.company);
       },

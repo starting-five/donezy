@@ -11,7 +11,6 @@ import ImageGallery from "../../components/ImageGallery/ImageGallery";
 import "./PreviewPage.css";
 
 const PreviewPage = ({ postType, sectionImages, comment }) => {
-
   return (
     <div className="preview-page">
       <Box sx={{ maxWidth: 600, mx: "auto", my: 3, px: 2 }}>
@@ -52,6 +51,7 @@ const PreviewPage = ({ postType, sectionImages, comment }) => {
       ))}
       {comment && (
         <Box
+          id="preview-comment"
           className="preview-comment-box"
           sx={{
             mt: 3,

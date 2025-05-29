@@ -15,7 +15,7 @@ import {
   Stepper,
   Typography,
 } from "@mui/material";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useSelector } from "react-redux";
 import FileUploader from "../../components/FileUploader/FileUploader";
 import { CREATE_POST } from "../../graphql/mutations/postMutation";
@@ -26,12 +26,16 @@ import AddContentPage from "../AddContentPage/AddContentPage";
 import PreviewPage from "../PreviewPage/PreviewPage";
 import SelectPostTypePage from "../SelectPostTypePage/SelectPostTypePage";
 import "./CreatePage.css";
+import { saveDraft } from "../../dexie/saveDraft";
+import { deleteDraft } from "../../dexie/deleteDraft";
+import { useLocation } from "react-router-dom";
 
 const CreatePage = () => {
   const [activeStep, setActiveStep] = useState(0);
   const [postType, setPostType] = useState(null);
   const [sectionImages, setSectionImages] = useState([]);
   const [comment, setComment] = useState("");
+  const [internalMemo, setInternalMemo] = useState("");
   const [isFinished, setIsFinished] = useState(false);
   const [createPost] = useMutation(CREATE_POST);
   const loggedInUserId = useSelector(getUserId);
@@ -39,8 +43,13 @@ const CreatePage = () => {
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
   const [snackbarSeverity, setSnackbarSeverity] = useState("success");
+  const [duration, setDuration] = useState(null);
+  const draftInitializedRef = useRef(false);
 
   const steps = ["Select post type", "Add content", " Preview"];
+
+  const location = useLocation();
+  const draft = location.state?.draft || null; // Get draft from location state if available
 
   const handleNext = () => {
     if (activeStep < steps.length - 1) {
@@ -61,12 +70,36 @@ const CreatePage = () => {
     }
   };
 
+  const handleSaveDraft = async () => {
+    try {
+      await saveDraft(loggedInUserId, {
+        postType,
+        sectionImages,
+        comment,
+        internalMemo,
+        uniqueId,
+      });
+      handleReset();
+      setDuration(6000); // Set auto-hide duration for the snackbar
+      setSnackbarMessage("Draft saved successfully!");
+      setSnackbarSeverity("info");
+      setOpenSnackbar(true);
+    } catch (error) {
+      console.error("Error saving draft:", error);
+      setSnackbarMessage("Failed to save draft.");
+      setSnackbarSeverity("error");
+      setOpenSnackbar(true);
+      return;
+    }
+  };
+
   const handleReset = () => {
     setActiveStep(0);
     setPostType(null);
     setSectionImages([]);
     setUniqueId(generateUniqueId(12));
     setComment("");
+    setInternalMemo("");
     setIsFinished(false);
     setOpenSnackbar(false);
   };
@@ -98,8 +131,12 @@ const CreatePage = () => {
     });
   };
 
-  const handleTextInput = (event) => {
+  const handleCommentInput = (event) => {
     setComment(event.target.value);
+  };
+
+  const handleInternalMemoInput = (event) => {
+    setInternalMemo(event.target.value);
   };
 
   const handleUploadComplete = (allUploaded) => {
@@ -130,15 +167,32 @@ const CreatePage = () => {
           postId: uniqueId,
           postTypeId: postType.id,
           comments: comment,
+          internalMemo: internalMemo,
         },
         onError: (error) => {
           console.error("Error creating post", error);
         },
         onCompleted: (response) => {
-          console.log("Post completed successfully:", response);
+          // console.log("Post completed successfully:", response);
+          if (draft) {
+            // console.log("Deleting draft:", draft.uniqueId);
+            deleteDraft(draft.uniqueId)
+              .then(() => {
+                // console.log("Draft deleted successfully");
+              })
+              .catch((error) => {
+                console.error("Error deleting draft:", error);
+              });
+
+            sectionImages.forEach((section) => {
+              section.forEach((image) => {
+                URL.revokeObjectURL(image.url); // Clean up blob URLs
+              });
+            });
+          }
         },
         onSuccess: (response) => {
-          console.log("Post created successfully:", response.data.createPost);
+          // console.log("Post created successfully:", response.data.createPost);
         },
       });
     } else {
@@ -151,18 +205,43 @@ const CreatePage = () => {
 
   const handleCloseSnackbar = () => {
     setOpenSnackbar(false); // Close the snackbar when the user clicks the close button
+    setDuration(null); // Reset the duration to null to prevent auto-hide
   };
 
   useEffect(() => {
-    if (postType) {
-      const initialSectionImages = postType.sections.map(() => []);
-      setSectionImages(initialSectionImages);
-      setComment("");
-    }
-  }, [postType]);
+  if (draft && !draftInitializedRef.current) {
+    // console.log("Applying draft data...");
+    draftInitializedRef.current = true;
+
+    const hydratedSectionImages = draft.sectionImages.map(section =>
+      section.map(image => ({
+        ...image,
+        url: URL.createObjectURL(image.file),
+      }))
+    );
+
+    setPostType(draft.postType);
+    setSectionImages(hydratedSectionImages);
+    setComment(draft.comment);
+    setInternalMemo(draft.internalMemo);
+    setUniqueId(draft.uniqueId || generateUniqueId(12));
+    setActiveStep(1);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  } else if (!draft && postType && !draftInitializedRef.current) {
+    // console.log("Initializing empty state from postType...");
+    draftInitializedRef.current = true;
+
+    const initialSectionImages = postType.sections.map(() => []);
+    setSectionImages(initialSectionImages);
+    setComment("");
+    setInternalMemo("");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+}, [draft, postType]);
 
   return (
-    <div className="create-page">
+    <Box id="create-page" className="create-page">
       <Stepper id="createPageStepper" activeStep={activeStep} alternativeLabel>
         {steps.map((label, index) => (
           <Step key={index}>
@@ -183,8 +262,11 @@ const CreatePage = () => {
             comment={comment}
             handleImageChange={handleImageChange}
             handleDeleteImage={handleDeleteImage}
-            handleTextInput={handleTextInput}
+            handleCommentInput={handleCommentInput}
+            handleInternalMemoInput={handleInternalMemoInput}
+            handleSaveDraft={handleSaveDraft}
             sectionImages={sectionImages}
+            internalMemo={internalMemo}
           ></AddContentPage>
         )}
         {activeStep === 2 && !isFinished && (
@@ -243,6 +325,8 @@ const CreatePage = () => {
       {/* Snackbar for notifications */}
       <Snackbar
         open={openSnackbar}
+        autoHideDuration={duration}
+        onClose={handleCloseSnackbar}
         anchorOrigin={{
           vertical: "top", // Position the Snackbar at the top
           horizontal: "center", // Position it in the center horizontally
@@ -277,7 +361,7 @@ const CreatePage = () => {
           </IconButton>
         </Alert>
       </Snackbar>
-    </div>
+    </Box>
   );
 };
 export default CreatePage;

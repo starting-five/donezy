@@ -16,6 +16,7 @@ scalar Date
     comments: String  # Optional comments for the post 
     user: User  # Reference to the User object
     postType: PostType  # Reference to the Post Type object
+    internalMemo: String  # Optional internal memo for the post
   }
 `;
 

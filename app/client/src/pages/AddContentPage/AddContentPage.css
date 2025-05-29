@@ -1,7 +1,7 @@
 .create-post-page {
   max-width: 700px;
-  margin: 32px auto;
-  padding: 24px;
+  /* margin: 32px auto; */
+  padding: 12px;
   background: #f9f9f9;
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.07);
@@ -27,4 +27,10 @@
   padding: 8px;
   font-family: inherit;
   font-size: 1rem;
+}
+
+@media only screen and (max-width: 600px) {
+  #comment-textarea, #memo-textarea {
+      width: 80vw;
+  } 
 }

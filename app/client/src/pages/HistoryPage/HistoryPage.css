@@ -1,10 +1,11 @@
 .container {
   max-width: 900px;
-  margin: 100px auto;
-  padding: 24px;
+  margin: 80px auto;
+  padding: 8px;
   background: #f9f9f9;
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+  overflow-y: auto;
 }
 
 .title {
@@ -22,5 +23,16 @@
   display: flex;
   gap: 8px;
   margin-top: 16px;
-  justify-content: flex-end;
+  justify-content: space-evenly;
+}
+
+@media only screen and (max-width: 600px) {
+  #history-table {
+    word-break: break-word;
+    table-layout: fixed;
+  }
+
+  .MuiTableCell-body{
+    padding: 8px !important;
+  }
 }
