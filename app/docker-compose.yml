@@ -7,12 +7,6 @@ services:
       dockerfile: Dockerfile
     container_name: donezy_server
     restart: always
-    environment:
-      - NODE_ENV=production
-      - PORT=4000
-      - MONGO_URI=mongodb+srv://test:test123@cluster0.x3jbkt7.mongodb.net/donezy_dev
-      - AUTH0_DOMAIN=dev-wxhqloss2kgzeq53.us.auth0.com
-      - AUTH0_AUDIENCE=https://dev-wxhqloss2kgzeq53.us.auth0.com/api/v2/
       # add other env vars / secrets here
     expose:
       - "4000"
