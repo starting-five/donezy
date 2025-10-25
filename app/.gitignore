@@ -6,4 +6,3 @@
 *.tar
 ignore.tar
 .env
-**/.env
