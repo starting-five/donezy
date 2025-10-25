@@ -1,7 +1,17 @@
-FROM node:18
+# server/Dockerfile
+FROM node:20
 WORKDIR /app
+
+# Install dependencies
 COPY package*.json ./
-RUN npm install
+RUN npm ci --production
+
+# Copy source
 COPY . .
+
+# Expose the port your server runs on
 EXPOSE 4000
-CMD ["node", "index.js"]
+
+# Use environment variables for sensitive config: MONGO_URI, JWT_SECRET, AUTH0_DOMAIN, etc.
+CMD ["node", "dist/index.js"]
+# or if you run with nodemon in dev: ["npm", "start"]

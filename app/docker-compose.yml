@@ -1,33 +1,43 @@
-# version: "3.8"
-# services:
-#   client:
-#     build: ./client
-#     image: donezy-client:beta-001
-#     ports:
-#       - "3000:80"
-#     environment:
-#       - REACT_APP_AUTH0_DOMAIN=dev-y408zc6506ad3723.us.auth0.com
-#       - REACT_APP_AUTH0_CLIENT_ID=fhyhPAa8VwmgV8vB45LJBy1WLCBn3w14
-#       - REACT_APP_AUTH0_AUDIENCE=https://dev-y408zc6506ad3723.us.auth0.com/api/v2/
-#       - REACT_APP_GRAPHQL_SERVER_URL=http://localhost:4000/graphql
-#       - REACT_APP_API_SERVER_URL=http://localhost:4000
-#       - REACT_APP_CLIENT_URL=REACT_APP_CLIENT_URL=https://donezy.net
-#       - AUTH0_AUDIENCE=https://dev-y408zc6506ad3723.us.auth0.com/api/v2 
+version: "3.8"
+services:
 
-#     depends_on:
-#       - server
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: donezy_server
+    restart: always
+    environment:
+      - NODE_ENV=production
+      - PORT=4000
+      - MONGO_URI=mongodb+srv://test:test123@cluster0.x3jbkt7.mongodb.net/donezy_dev
+      - AUTH0_DOMAIN=dev-wxhqloss2kgzeq53.us.auth0.com
+      - AUTH0_AUDIENCE=https://dev-wxhqloss2kgzeq53.us.auth0.com/api/v2/
+      # add other env vars / secrets here
+    expose:
+      - "4000"
+    networks:
+      - donezy_net
 
-#   server:
-#     build: ./server
-#     image: donezy-server:beta-001
-#     expose:
-#       - "4000"
-#     environment:
-#       - MONGO_URI=mongodb+srv://test:test123@cluster0.x3jbkt7.mongodb.net/donezy_dev
-#       - AWS_ACCESS_KEY_ID=AKIARXR7OELODM56VL7V
-#       - AWS_SECRET_ACCESS_KEY=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
-#       - AWS_S3_BUCKET=donezy
-#       - AWS_REGION=us-west-1
-#       - AUTH0_AUDIENCE=https://dev-y408zc6506ad3723.us.auth0.com/api/v2/
-#       - AUTH0_DOMAIN=dev-y408zc6506ad3723.us.auth0.com
-#       - PORT=4000
+  nginx:
+    build:
+      context: .
+      dockerfile: docker/nginx/Dockerfile
+    container_name: donezy_nginx
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      # if using certbot on host, mount letsencrypt dir:
+      - /etc/letsencrypt:/etc/letsencrypt:ro
+      # Optional: serve certbot challenge dir
+      - /var/www/letsencrypt:/var/www/letsencrypt
+    depends_on:
+      - server
+    networks:
+      - donezy_net
+
+networks:
+  donezy_net:
+    driver: bridge
